@@ -1,6 +1,7 @@
 package data
 
 import (
+	"database/sql"
 	"time"
 
 	"movieapi.sanjayojha.dev/internal/validator"
@@ -32,4 +33,25 @@ func ValidateMovie(v *validator.Validator, movie *Movie) {
 
 	// Note that we're using the Unique helper in the line below to check that all values in the input.Genres slice are unique.
 	v.Check(validator.Unique(movie.Genres), "genres", "must not contain duplicate values")
+}
+
+// model
+type MovieModel struct {
+	DB *sql.DB
+}
+
+func (m MovieModel) Insert(movie *Movie) error {
+	return nil
+}
+
+func (m MovieModel) Get(id int) (*Movie, error) {
+	return nil, nil
+}
+
+func (m MovieModel) Update(movie *Movie) error {
+	return nil
+}
+
+func (m MovieModel) Delete(id int) error {
+	return nil
 }

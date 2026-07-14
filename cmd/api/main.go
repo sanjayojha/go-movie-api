@@ -16,6 +16,7 @@ import (
 	// compiler complaining that the package isn't being used.
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
+	"movieapi.sanjayojha.dev/internal/data"
 )
 
 const version = "0.0.1"
@@ -39,6 +40,7 @@ type config struct {
 type application struct {
 	config config
 	logger *slog.Logger
+	models data.Models
 }
 
 func main() {
@@ -90,6 +92,7 @@ func main() {
 	app := &application{
 		config: cfg,
 		logger: logger,
+		models: data.NewModels(db),
 	}
 
 	// mux := http.NewServeMux()
