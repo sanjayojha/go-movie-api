@@ -6,7 +6,6 @@ import (
 	"flag"
 	"fmt"
 	"log/slog"
-	"net/http"
 	"net/url"
 	"os"
 	"time"
@@ -108,20 +107,11 @@ func main() {
 	// mux := http.NewServeMux()
 	// mux.HandleFunc("/v1/healthcheck", app.healthcheckHandler)
 
-	server := &http.Server{
-		Addr:         fmt.Sprintf(":%d", cfg.port),
-		Handler:      app.routes(), //mux
-		ErrorLog:     slog.NewLogLogger(logger.Handler(), slog.LevelError),
-		ReadTimeout:  5 * time.Second,
-		WriteTimeout: 10 * time.Second,
-		IdleTimeout:  time.Minute,
+	err = app.serve()
+	if err != nil {
+		logger.Error(err.Error())
+		os.Exit(1)
 	}
-
-	logger.Info("Starting Server", "Addr", server.Addr, "Env", cfg.env)
-
-	err = server.ListenAndServe()
-	logger.Error(err.Error())
-	os.Exit(1)
 }
 
 func openDB(cfg config) (*sql.DB, error) {
