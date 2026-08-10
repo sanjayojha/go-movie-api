@@ -144,8 +144,7 @@ func (app *application) readInt(qs url.Values, key string, defaultValue int, v *
 // The background() helper accepts an arbitrary function as a parameter.
 func (app *application) background(fn func()) {
 	// Launch a background goroutine.
-	go func() {
-
+	app.wg.Go(func() {
 		// Run a deferred function which uses recover() to catch any panic, and log an error message instead of terminating the application.
 		defer func() {
 			pv := recover()
@@ -156,5 +155,21 @@ func (app *application) background(fn func()) {
 
 		// Execute the arbitrary function that we passed as the parameter to run in background.
 		fn()
-	}()
+	})
+
+	// old way of launching goroutine. It is without waitGroup.
+	// go func() {
+
+	// 	// Run a deferred function which uses recover() to catch any panic, and log an error message instead of terminating the application.
+	// 	defer func() {
+	// 		pv := recover()
+	// 		if pv != nil {
+	// 			app.logger.Error(fmt.Sprintf("%v", pv))
+	// 		}
+	// 	}()
+
+	// 	// Execute the arbitrary function that we passed as the parameter to run in background.
+	// 	fn()
+
+	// }()
 }
