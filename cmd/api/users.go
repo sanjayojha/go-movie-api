@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"net/http"
+	"time"
 
 	"movieapi.sanjayojha.dev/internal/data"
 	"movieapi.sanjayojha.dev/internal/validator"
@@ -58,9 +59,25 @@ func (app *application) registerUserHandler(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
+	// setting activation token in database
+	ttl := 3 * 24 * time.Hour
+	scope := data.ScopeActivation
+	token, err := app.models.Tokens.New(user.ID, ttl, scope)
+
+	if err != nil {
+		app.serverErrorResponse(w, r, err)
+		return
+	}
+
 	// running goroutine for background run
 	app.background(func() {
-		err := app.mailer.Send(user.Email, "user_welcome.tmpl", user)
+
+		data := map[string]any{
+			"userID":          user.ID,
+			"activationToken": token.PlainText,
+		}
+
+		err := app.mailer.Send(user.Email, "user_welcome.tmpl", data)
 		if err != nil {
 			app.logger.Error(err.Error())
 		}
