@@ -24,6 +24,7 @@ func (app *application) routes() http.Handler {
 
 	// Add the route for the /v1/users endpoints.
 	router.HandlerFunc(http.MethodPost, "/v1/users", app.registerUserHandler)
+	router.HandlerFunc(http.MethodPut, "/v1/users/activated", app.activateUserHandler)
 
 	// Wrap the router with the panic recovery middleware.
 	return app.recoverPanic(app.rateLimit(router))
