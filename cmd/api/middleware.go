@@ -1,13 +1,17 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
+	"strings"
 	"sync"
 	"time"
 
 	"github.com/tomasen/realip"
 	"golang.org/x/time/rate"
+	"movieapi.sanjayojha.dev/internal/data"
+	"movieapi.sanjayojha.dev/internal/validator"
 )
 
 func (app *application) recoverPanic(next http.Handler) http.Handler {
@@ -81,6 +85,52 @@ func (app *application) rateLimit(next http.Handler) http.Handler {
 
 		// Very importantly, unlock the mutex before calling the next handler in the chain. Notice that we DON'T use defer to unlock the mutex, as that would mean that the mutex isn't unlocked until all the handlers downstream of this middleware have also returned.
 		mu.Unlock()
+		next.ServeHTTP(w, r)
+	})
+}
+
+func (app *application) authenticate(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+		w.Header().Add("Vary", "Authorization")
+
+		authorizationHeader := r.Header.Get("Authorization")
+
+		if authorizationHeader == "" {
+			r = app.contextSetUser(r, data.AnonymousUser)
+			next.ServeHTTP(w, r)
+			return
+		}
+
+		headerParts := strings.Split(authorizationHeader, " ")
+
+		if len(headerParts) != 2 || headerParts[0] != "Bearer" {
+			app.invalidAuthenticationTokenResponse(w, r)
+			return
+		}
+
+		token := headerParts[1]
+
+		v := validator.New()
+
+		data.ValidateTokenPlaintext(v, token)
+
+		if !v.Valid() {
+			app.invalidAuthenticationTokenResponse(w, r)
+			return
+		}
+
+		user, err := app.models.Users.GetForToken(data.ScopeAuthentication, token)
+		if err != nil {
+			switch {
+			case errors.Is(err, data.ErrRecordNotFound):
+				app.invalidAuthenticationTokenResponse(w, r)
+			default:
+				app.serverErrorResponse(w, r, err)
+			}
+		}
+
+		r = app.contextSetUser(r, user)
 		next.ServeHTTP(w, r)
 	})
 }

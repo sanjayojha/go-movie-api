@@ -15,6 +15,7 @@ type password struct {
 	plaintext *string
 	hash      []byte
 }
+
 type User struct {
 	ID        int       `json:"id"`
 	CreatedAt time.Time `json:"created_at"`
@@ -24,6 +25,8 @@ type User struct {
 	Activated bool      `json:"activated"`
 	Version   int       `json:"-"`
 }
+
+var AnonymousUser = &User{}
 
 func (p *password) Set(plaintextPassword string) error {
 	hash, err := bcrypt.GenerateFromPassword([]byte(plaintextPassword), 12)
@@ -221,4 +224,8 @@ func (m UserModel) GetForToken(tokenScope, tokenPlaintext string) (*User, error)
 	}
 
 	return &user, nil
+}
+
+func (u *User) IsAnonymous() bool {
+	return u == AnonymousUser
 }
