@@ -59,6 +59,12 @@ func (app *application) registerUserHandler(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
+	err = app.models.Permissions.AddForUser(user.ID, "movies:read")
+	if err != nil {
+		app.serverErrorResponse(w, r, err)
+		return
+	}
+
 	// setting activation token in database
 	ttl := 3 * 24 * time.Hour
 	scope := data.ScopeActivation
