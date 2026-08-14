@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"database/sql"
+	"expvar"
 	"flag"
 	"fmt"
 	"log/slog"
@@ -135,6 +136,8 @@ func main() {
 		logger.Error(err.Error())
 		os.Exit(1)
 	}
+
+	expvar.NewString("version").Set(version)
 
 	app := &application{
 		config: cfg,
