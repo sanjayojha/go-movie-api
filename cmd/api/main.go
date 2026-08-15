@@ -21,9 +21,12 @@ import (
 	_ "github.com/lib/pq"
 	"movieapi.sanjayojha.dev/internal/data"
 	"movieapi.sanjayojha.dev/internal/mailer"
+	"movieapi.sanjayojha.dev/internal/vcs"
 )
 
-const version = "0.0.1"
+var (
+	version = vcs.Version()
+)
 
 type config struct {
 	port int
