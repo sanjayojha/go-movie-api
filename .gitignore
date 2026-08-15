@@ -1,4 +1,6 @@
 .vscode
 details.*
 .env
+.envrc
+bin/
 learningNotes

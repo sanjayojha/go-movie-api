@@ -112,7 +112,15 @@ func main() {
 		return nil
 	})
 
+	// Display version
+	displayVersion := flag.Bool("version", false, "Display version and exit")
+
 	flag.Parse()
+
+	if *displayVersion {
+		fmt.Printf("Version:\t%s\n", version)
+		os.Exit(0)
+	}
 
 	// Basic validation to catch missing configuration early
 	if cfg.db.user == "" || cfg.db.password == "" || cfg.db.host == "" {
