@@ -173,7 +173,7 @@ Apply them in ascending numeric order on a fresh database, and use the matching 
 
 ### Configuration
 
-Configuration is read from command line flags, with database settings defaulting to environment variables. Rather than exporting a single pre-built DSN into the shell environment, credentials are kept as discrete variables in a `.env` file, loaded at startup with `joho/godotenv`, and the DSN is assembled in code. That keeps the individual values available to the application, avoids hand encoding reserved characters into a connection string, and means a developer only has to copy a file rather than remember to source one. If `.env` is absent the application falls back to the process environment and logs a warning, so the same binary works unchanged in a deployed environment where the variables are injected by the platform.
+Configuration is read from command line flags, with database and SMTP settings defaulting to environment variables. Keeping the SMTP credentials out of the flag defaults means they are never visible in a process listing when the service is started by an init system. Rather than exporting a single pre-built DSN into the shell environment, credentials are kept as discrete variables in a `.env` file, loaded at startup with `joho/godotenv`, and the DSN is assembled in code. That keeps the individual values available to the application, avoids hand encoding reserved characters into a connection string, and means a developer only has to copy a file rather than remember to source one. If `.env` is absent the application falls back to the process environment and logs a warning, so the same binary works unchanged in a deployed environment where the variables are injected by the platform.
 
 Copy `.env.example` to `.env` and fill in the values:
 
@@ -201,10 +201,10 @@ Available flags:
 | `-limiter-rps` | `2` | Rate limiter requests per second |
 | `-limiter-burst` | `4` | Rate limiter burst |
 | `-limiter-enabled` | `true` | Enable the rate limiter |
-| `-smtp-host` | `127.0.0.1` | SMTP host |
-| `-smtp-port` | `1025` | SMTP port |
-| `-smtp-username` | empty | SMTP username. When empty, TLS is disabled for local development |
-| `-smtp-password` | empty | SMTP password |
+| `-smtp-host` | `$SMTP_HOST` | SMTP host |
+| `-smtp-port` | `$SMTP_PORT` | SMTP port |
+| `-smtp-username` | `$SMTP_USERNAME` | SMTP username. When empty, TLS is disabled for local development |
+| `-smtp-password` | `$SMTP_PASSWORD` | SMTP password |
 | `-smtp-sender` | `Greenlight API <no-reply@...>` | Sender address |
 | `-cors-trusted-origins` | empty | Space separated list of trusted origins |
 | `-version` | | Print the build version and exit |

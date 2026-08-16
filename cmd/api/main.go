@@ -107,8 +107,7 @@ func main() {
 	flag.StringVar(&cfg.smtp.username, "smtp-username", os.Getenv("SMTP_USERNAME"), "SMTP username")
 	flag.StringVar(&cfg.smtp.password, "smtp-password", os.Getenv("SMTP_PASSWORD"), "SMTP password")
 	flag.StringVar(&cfg.smtp.host, "smtp-host", os.Getenv("SMTP_HOST"), "SMTP host")
-
-	flag.StringVar(&cfg.smtp.sender, "smtp-sender", "Greenlight API <no-reply@greenlight.sanjayojha.dev>", "SMTP sender")
+	flag.StringVar(&cfg.smtp.sender, "smtp-sender", os.Getenv("SMTP_SENDER"), "SMTP sender")
 
 	//setting cors origin
 	flag.Func("cors-trusted-origins", "Trusted CORS origins (space separated)", func(val string) error {
@@ -129,6 +128,13 @@ func main() {
 	// Basic validation to catch missing configuration early
 	if cfg.db.user == "" || cfg.db.password == "" || cfg.db.host == "" {
 		logger.Error("Critical database environment variables are missing")
+		os.Exit(1)
+	}
+
+	// The SMTP host and port have no fallback defaults, so check them here. Otherwise a
+	// missing SMTP_PORT only surfaces further down as an unhelpful strconv parse error.
+	if cfg.smtp.host == "" || cfg.smtp.port == "" {
+		logger.Error("Critical SMTP environment variables are missing")
 		os.Exit(1)
 	}
 
