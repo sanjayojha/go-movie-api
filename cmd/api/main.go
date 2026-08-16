@@ -50,7 +50,7 @@ type config struct {
 
 	smtp struct {
 		host     string
-		port     int
+		port     string
 		username string
 		password string
 		sender   string
@@ -103,10 +103,11 @@ func main() {
 
 	// smtp
 	// We are using mailpit container
-	flag.StringVar(&cfg.smtp.host, "smtp-host", "127.0.0.1", "SMTP host")
-	flag.IntVar(&cfg.smtp.port, "smtp-port", 1025, "SMTP port")
-	flag.StringVar(&cfg.smtp.username, "smtp-username", "", "SMTP username")
-	flag.StringVar(&cfg.smtp.password, "smtp-password", "", "SMTP password")
+	flag.StringVar(&cfg.smtp.port, "smtp-port", os.Getenv("SMTP_PORT"), "SMTP port")
+	flag.StringVar(&cfg.smtp.username, "smtp-username", os.Getenv("SMTP_USERNAME"), "SMTP username")
+	flag.StringVar(&cfg.smtp.password, "smtp-password", os.Getenv("SMTP_PASSWORD"), "SMTP password")
+	flag.StringVar(&cfg.smtp.host, "smtp-host", os.Getenv("SMTP_HOST"), "SMTP host")
+
 	flag.StringVar(&cfg.smtp.sender, "smtp-sender", "Greenlight API <no-reply@greenlight.sanjayojha.dev>", "SMTP sender")
 
 	//setting cors origin

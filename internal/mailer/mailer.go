@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"embed"
 	ht "html/template"
+	"strconv"
 	tt "text/template"
 	"time"
 
@@ -20,11 +21,16 @@ type Mailer struct {
 	sender string
 }
 
-func New(host string, port int, username, password, sender string) (*Mailer, error) {
+func New(host, port, username, password, sender string) (*Mailer, error) {
+
+	portInt, err := strconv.Atoi(port)
+	if err != nil {
+		return nil, err
+	}
 
 	// Initialize options with default local development behaviors
 	opts := []mail.Option{
-		mail.WithPort(port),
+		mail.WithPort(portInt),
 		mail.WithTimeout(5 * time.Second),
 	}
 
